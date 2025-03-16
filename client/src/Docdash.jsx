@@ -100,7 +100,7 @@ const Docdash = () => {
     sessionStorage.setItem("selectedPatient", JSON.stringify(selectedPatient));
   
     // Open prescription page in a new tab
-    window.open("/Prescription", "_blank");
+    window.open("/Prescription", "_self");
   };
 
 
