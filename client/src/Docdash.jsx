@@ -99,10 +99,10 @@ const Docdash = () => {
     
     // Store selected patient details in sessionStorage
     sessionStorage.setItem("selectedPatient", JSON.stringify(selectedPatient));
-    localStroage.setItem("selectedPatient", JSON.stringify(selectedPatient));
+    localStorage.setItem("selectedPatient", JSON.stringify(selectedPatient));
   
     // Open prescription page in a new tab
-    navigate("/Prescription");
+    window.open("/Prescription", "_blank");
   };
 
 
