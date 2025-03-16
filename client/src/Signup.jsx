@@ -77,7 +77,7 @@ const Signup = () => {
       setPhone("");
       setPassword("");
       setAdminkey("");
-      navigate('/Login')
+      navigate('/')
     } catch (err) {
       // Handle errors
       console.error("Error Response:", err.response || err);
@@ -254,7 +254,7 @@ const Signup = () => {
             <div className="text-center mt-4">
               <p className="m-0 text-secondary">
                 Already have an account?{" "}
-                <a href="/Login" className="link-info text-decoration-none">
+                <a href="/" className="link-info text-decoration-none">
                   Login
                 </a>
               </p>
