@@ -16,10 +16,10 @@ function App() {
       <BrowserRouter>
         <Routes>
       
+      <Route path="/" element={<Login />}></Route>
       <Route path="/Patientdash" element={<Patientdash />} ></Route>
       <Route path="/Appointment" element={<Appointment />}></Route>
       <Route path="/Signup" element={<Signup />}></Route>
-      <Route path="/Login" element={<Login />}></Route>
       <Route path="/Docdash" element={<Docdash />}></Route>
       <Route path="/Staffdash" element={<Staffdash />}></Route>
       <Route path="/Prescription" element={<Prescription />}></Route>
