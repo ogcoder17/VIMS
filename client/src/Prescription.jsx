@@ -84,6 +84,13 @@ const Prescription = () => {
     window.print();
   };
 
+  useEffect(() => {
+    const storedPatient = localStorage.getItem("selectedPatient");
+    if (storedPatient) {
+      setPatient(JSON.parse(storedPatient));
+    }
+  }, []);
+
   return (
     <div className="prescription">
       <h1>Prescription</h1>

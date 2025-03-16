@@ -103,7 +103,7 @@ const Docdash = () => {
     window.open("/Prescription", "_blank");
   };
 
-  
+
   return (
     <div className="docdash-container">
       <Signout />
