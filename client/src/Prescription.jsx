@@ -5,13 +5,16 @@ import "./css/Prescription.css";
 const Prescription = () => {
   const prescriptionRef = useRef(null);
 
-  // Retrieve selected patient details from sessionStorage
+  // Retrieve selected patient details from storage
   const [patient, setPatient] = useState(null);
 
   useEffect(() => {
-    const storedPatient = sessionStorage.getItem("selectedPatient");
+    const storedPatient = sessionStorage.getItem("selectedPatient") || localStorage.getItem("selectedPatient");
     if (storedPatient) {
+      console.log("Retrieved Patient Data:", JSON.parse(storedPatient));
       setPatient(JSON.parse(storedPatient));
+    } else {
+      console.log("No patient data found in storage.");
     }
   }, []);
 
@@ -79,17 +82,10 @@ const Prescription = () => {
       console.error("Error capturing prescription:", error);
     }
   };
-  
-  const printPrescription= () => {
+
+  const printPrescription = () => {
     window.print();
   };
-
-  useEffect(() => {
-    const storedPatient = localStorage.getItem("selectedPatient");
-    if (storedPatient) {
-      setPatient(JSON.parse(storedPatient));
-    }
-  }, []);
 
   return (
     <div className="prescription">
@@ -133,7 +129,6 @@ const Prescription = () => {
       )}
 
       <button className="upload-btn" onClick={captureAndUploadPrescription}>Upload Prescription</button>
-      
     </div>
   );
 };
