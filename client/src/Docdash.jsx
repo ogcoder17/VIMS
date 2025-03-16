@@ -96,17 +96,14 @@ const Docdash = () => {
   const navigatePrescription = () => {
     if (!selectedPatient) return;
   
-    const url = `/Prescription`; // Prescription page route
-    const newTab = window.open(url, "_blank"); // Open in a new tab
+    // Store selected patient details in sessionStorage
+    sessionStorage.setItem("selectedPatient", JSON.stringify(selectedPatient));
   
-    if (newTab) {
-      // Store selected patient details in sessionStorage to be accessed in the new tab
-      sessionStorage.setItem("selectedPatient", JSON.stringify(selectedPatient));
-    } else {
-      alert("Popup blocked! Please allow popups for this site.");
-    }
+    // Open prescription page in a new tab
+    window.open("/Prescription", "_blank");
   };
 
+  
   return (
     <div className="docdash-container">
       <Signout />

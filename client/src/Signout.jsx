@@ -12,7 +12,7 @@ const SignOut = () => {
     localStorage.removeItem("accessToken");
     
     // Redirect to login page
-    navigate("/login");
+    navigate("/");
   };
 
   return (
