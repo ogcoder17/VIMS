@@ -1,0 +1,80 @@
+/* Staff Dashboard Styling */
+.staffdash-container {
+    display: flex;
+    height: 100vh;
+    font-family: 'Arial', sans-serif;
+    background-color: #eef2f7;
+  }
+  
+  .sidebar {
+    width: 25%;
+    background-color: teal;
+    color: white;
+    padding: 20px;
+    box-shadow: 3px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar h2 {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    border-bottom: 2px solid white;
+    padding-bottom: 10px;
+  }
+  
+  .patient-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .patient-item {
+    padding: 12px;
+    background: #34495e;
+    margin: 8px 0;
+    border-radius: 6px;
+    text-align: center;
+    transition: 0.3s;
+  }
+  
+  .patient-item:hover {
+    background: #1abc9c;
+  }
+  
+  .right-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .action-box {
+    width: 200px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #3498db;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+  }
+  
+  .action-box:hover {
+    background: #2980b9;
+  }
+  
+  .text-center {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .hospital-name {
+    font-family: "serif";
+  }

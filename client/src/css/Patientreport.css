@@ -1,0 +1,64 @@
+.patient-report-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  font-size: 24px;
+}
+
+.header select {
+  padding: 5px 10px;
+  font-size: 16px;
+}
+
+.btn.back-btn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn.back-btn:hover {
+  background-color: #0056b3;
+}
+
+.error-message,
+.no-data-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.report-section {
+  margin-top: 20px;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.report-table th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+}

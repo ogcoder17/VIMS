@@ -5,11 +5,13 @@ import "./css/Appointment.css";
 import Signout from "./Signout";
 
 const Appointment = () => {
-  const { state } = useLocation(); 
+  const { state } = useLocation();
   const navigate = useNavigate();
   const patient = state?.patient || {};
   const [doctors, setDoctors] = useState([]);
-  const [selectedDoctorId, setSelectedDoctorId] = useState(localStorage.getItem("doctorId") || "");
+  const [selectedDoctorId, setSelectedDoctorId] = useState(
+    localStorage.getItem("doctorId") || ""
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -23,6 +25,7 @@ const Appointment = () => {
     weight: "",
     datetime: "",
     readyToBook: "",
+    room: "",
   });
 
   // Fetch doctors on mount
@@ -75,7 +78,16 @@ const Appointment = () => {
     setSuccessMessage("");
 
     // Validation: Ensure required fields are filled
-    if (!formData.phone || !formData.disease || !formData.bp || !formData.weight || !formData.temperature || !selectedDoctorId || !formData.datetime) {
+    if (
+      !formData.phone ||
+      !formData.disease ||
+      !formData.bp ||
+      !formData.weight ||
+      !formData.temperature ||
+      !selectedDoctorId ||
+      !formData.datetime ||
+      !formData.room
+    ) {
       setErrorMessage("Please fill all required fields.");
       return;
     }
@@ -100,6 +112,7 @@ const Appointment = () => {
         body_temp: formData.temperature,
         ready: formData.readyToBook === "yes",
         appointment_sch: new Date(formData.datetime).toLocaleTimeString(),
+        room_no: formData.room,
       },
     };
 
@@ -126,6 +139,7 @@ const Appointment = () => {
           temperature: "",
           datetime: "",
           readyToBook: "",
+          room: "",
         });
         setSelectedDoctorId("");
         navigate("/Staffdash");
@@ -134,32 +148,49 @@ const Appointment = () => {
       }
     } catch (error) {
       console.error("Error booking appointment:", error.response || error);
-      setErrorMessage(error.response?.data?.error || "An error occurred. Please try again.");
+      setErrorMessage(
+        error.response?.data?.error || "An error occurred. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
-
-  
   };
-
-
 
   return (
     <div className="doc">
       <Signout />
-      <center><h1>Book Appointment</h1></center>
+      <center>
+        <h1>Book Appointment</h1>
+      </center>
       <form>
         <div>
           <label>Patient Contact:</label>
-          <input type="number" name="phone" value={formData.phone} onChange={handleChange} disabled={isSubmitting} />
+          <input
+            type="number"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            disabled={isSubmitting}
+          />
         </div>
         <div>
           <label>Disease:</label>
-          <input type="text" name="disease" value={formData.disease} onChange={handleChange} required disabled={isSubmitting} />
+          <input
+            type="text"
+            name="disease"
+            value={formData.disease}
+            onChange={handleChange}
+            required
+            disabled={isSubmitting}
+          />
         </div>
         <div>
-          <label>Select Doctor:</label>
-          <select value={selectedDoctorId} onChange={(e) => setSelectedDoctorId(e.target.value)} disabled={isSubmitting}>
+          <label>Select Doctor:</label>&nbsp;
+          <select
+            value={selectedDoctorId}
+            onChange={(e) => setSelectedDoctorId(e.target.value)}
+            disabled={isSubmitting}
+          >
             <option value="">-- Select a Doctor --</option>
             {doctors.map((doctor) => (
               <option key={doctor.user_id} value={doctor.user_id}>
@@ -169,36 +200,107 @@ const Appointment = () => {
           </select>
         </div>
         <br />
+        <div>
+          <label>Select Room Number: </label>&nbsp;
+          <select
+            name="room"
+            value={formData.room}
+            onChange={handleChange}
+            required
+            disabled={isSubmitting}
+          >
+            <option value="">-- Select a Room Number --</option>
+            <option value="6">Room 6 (Dr. Suryaprakash Garu)</option>
+            <option value="7">Room 7 (Dr. Srinivasa Rao Garu)</option>
+            <option value="15">Room 15 (Dr. RamaKrishna Garu)</option>
+            <option value="3">Room 3 (Dr. Rajeswari Garu)</option>
+            <option value="8">Room 8 (Dr. Prakash Garu)</option>
+          </select>
+        </div>
+        <br />
         <label>Vitals</label>
         <div>
           <label>Blood Pressure (BP):</label>
-          <input type="text" name="bp" value={formData.bp} onChange={handleChange} required disabled={isSubmitting} />
+          <input
+            type="text"
+            name="bp"
+            value={formData.bp}
+            onChange={handleChange}
+            required
+            disabled={isSubmitting}
+          />
         </div>
         <div>
           <label>Temperature (°C):</label>
-          <input type="number" name="temperature" value={formData.temperature} onChange={handleChange} required disabled={isSubmitting} />
+          <input
+            type="number"
+            name="temperature"
+            value={formData.temperature}
+            onChange={handleChange}
+            required
+            disabled={isSubmitting}
+          />
         </div>
         <div>
           <label>Weight (kg):</label>
-          <input type="number" name="weight" value={formData.weight} onChange={handleChange} required disabled={isSubmitting} />
+          <input
+            type="number"
+            name="weight"
+            value={formData.weight}
+            onChange={handleChange}
+            required
+            disabled={isSubmitting}
+          />
         </div>
         <br />
         <div>
           <label>Ready to book?</label>
           <div>
-            <label><input type="radio" name="readyToBook" value="yes" checked={formData.readyToBook === "yes"} onChange={handleChange} disabled={isSubmitting} /> Yes</label>
-            <label><input type="radio" name="readyToBook" value="no" checked={formData.readyToBook === "no"} onChange={handleChange} disabled={isSubmitting} /> No</label>
+            <label>
+              <input
+                type="radio"
+                name="readyToBook"
+                value="yes"
+                checked={formData.readyToBook === "yes"}
+                onChange={handleChange}
+                disabled={isSubmitting}
+              />{" "}
+              Yes
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="readyToBook"
+                value="no"
+                checked={formData.readyToBook === "no"}
+                onChange={handleChange}
+                disabled={isSubmitting}
+              />{" "}
+              No
+            </label>
           </div>
         </div>
         <div>
           <label>Preferred Date & Time:</label>
-          <input type="datetime-local" name="datetime" value={formData.datetime} onChange={handleChange} required disabled={isSubmitting} />
+          <input
+            type="datetime-local"
+            name="datetime"
+            value={formData.datetime}
+            onChange={handleChange}
+            required
+            disabled={isSubmitting}
+          />
         </div>
         <br />
         {errorMessage && <p className="text-danger">{errorMessage}</p>}
         {successMessage && <p className="text-success">{successMessage}</p>}
         <div>
-          <button type="button" className="btn btn-success" onClick={handleSubmit} disabled={isSubmitting}>
+          <button
+            type="button"
+            className="btn btn-success"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Submitting..." : "Save & Book Appointment"}
           </button>
         </div>

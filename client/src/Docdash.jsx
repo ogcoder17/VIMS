@@ -92,6 +92,10 @@ const Docdash = () => {
     }
   };
 
+  const navigateToReport = () => {
+    navigate("/DoctorReport");
+  };
+
 
   const navigatePrescription = () => {
     if (!selectedPatient) return;
@@ -124,11 +128,21 @@ const Docdash = () => {
         </ul>
       </div>
 
+      <div>
+        <button className="report-btn" onClick={navigateToReport}>
+          Doctor Report
+        </button>
+      </div>
+       
+
+
       <div className="main-content">
         <div className="text-center">
           <img src="./logo.png" alt="Hospital Logo" width="100" height="100" />
           <h3 style={{ fontFamily: "serif" }}>VIMS</h3>
         </div>
+
+      
 
         <div className="patient-details">
           <h2>Patient Details</h2>

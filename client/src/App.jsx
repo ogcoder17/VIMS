@@ -7,7 +7,8 @@ import Docdash from './Docdash'
 import Staffdash from "./Staffdash";
 import Prescription from "./Prescription";
 import Signout from "./Signout";
-
+import PatientReport from "./PatientReport";
+import DoctorReport from "./DoctorReport";
 
 function App() {
 
@@ -24,6 +25,8 @@ function App() {
       <Route path="/Staffdash" element={<Staffdash />}></Route>
       <Route path="/Prescription" element={<Prescription />}></Route>
       <Route path="/Signout" element={<Signout />}></Route>
+      <Route path="/PatientReport" element={<PatientReport />}></Route>
+      <Route path="/DoctorReport" element={<DoctorReport />}></Route>
 
         </Routes>
       </BrowserRouter>
