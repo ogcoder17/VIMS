@@ -18,14 +18,15 @@ const Patientdash = () => {
     address: "",
     phone_no: "",
   });
-  const [editIndex, setEditIndex] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedDoctorId, setSelectedDoctorId] = useState(localStorage.getItem("doctorId") || "");
-  const [selectedPatient, setSelectedPatient] = useState(null);
   const [doctors, setDoctors] = useState([]);
+  const [searchPhone, setSearchPhone] = useState("");
+  const [foundPatient, setFoundPatient] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +34,6 @@ const Patientdash = () => {
       const userId = localStorage.getItem("userId");
       const refreshToken = localStorage.getItem("refreshToken");
       const accessToken = localStorage.getItem("accessToken");
-      
 
       if (!userId || !refreshToken || !accessToken) {
         setErrorMessage("Authentication error. Please log in again.");
@@ -68,7 +68,6 @@ const Patientdash = () => {
 
   useEffect(() => {
     localStorage.setItem("patients", JSON.stringify(patients));
-
     if (patients.length > 0) {
       localStorage.setItem("registeredPatients", JSON.stringify(patients));
     }
@@ -76,7 +75,7 @@ const Patientdash = () => {
     const timeout = setTimeout(() => {
       localStorage.removeItem("patients");
       setPatients([]);
-    }, 600000); // 10 minutes (600,000 ms)
+    }, 60000); // 1 minute
 
     return () => clearTimeout(timeout);
   }, [patients]);
@@ -115,9 +114,6 @@ const Patientdash = () => {
     const selectedDoctor = doctors.find((doctor) => doctor.user_id === selectedDoctorId);
     const department = selectedDoctor ? selectedDoctor.designation : "Unknown";
 
-    console.log("Selected Doctor ID:", selectedDoctorId);
-    console.log("Mapped Department:", department);
-
     if (selectedDoctor) {
       localStorage.setItem("doctorDesignation", selectedDoctor.designation);
     }
@@ -134,7 +130,7 @@ const Patientdash = () => {
         sex: formData.sex,
         dob: formData.dob,
         health_info: formData.healthinfo,
-        doctor_id: selectedDoctorId, // ✅ Fixed here
+        doctor_id: selectedDoctorId,
         department,
       },
     };
@@ -152,29 +148,8 @@ const Patientdash = () => {
       );
 
       if (response.status === 200 || response.status === 201) {
-        setSuccessMessage(
-          editIndex !== null
-            ? "Patient updated successfully!"
-            : "Patient registered successfully!"
-        );
-
-        let updatedPatients = [...patients];
-        if (editIndex !== null) {
-          updatedPatients[editIndex] = {
-            ...formData,
-            doctor_id: selectedDoctorId, // ✅ Fixed here
-            department,
-          };
-          setEditIndex(null);
-        } else {
-          updatedPatients.push({
-            ...formData,
-            doctor_id: selectedDoctorId, // ✅ Fixed here
-            department,
-          });
-        }
-
-        setPatients(updatedPatients);
+        setSuccessMessage("Patient registered successfully!");
+        setPatients([...patients, { ...formData, doctor_id: selectedDoctorId, department }]);
         setFormData({
           fullName: "",
           healthinfo: "",
@@ -184,7 +159,7 @@ const Patientdash = () => {
           address: "",
           phone_no: "",
         });
-        setSelectedDoctorId(""); // Reset doctor ID after submission
+        setSelectedDoctorId("");
       } else {
         setErrorMessage("Failed to register the patient. Please try again.");
       }
@@ -196,39 +171,21 @@ const Patientdash = () => {
     }
   };
 
-  const handleFetchDoctorsAndNavigate = (patient) => {
+  const handleBookAppointment = (patient) => {
     navigate("/Appointment", { state: { patient, doctor: doctors } });
   };
 
-  const handleEdit = (index) => {
-    const selectedPatient = patients[index];
-    setFormData(selectedPatient);
-    setSelectedDoctorId(selectedPatient.doctor_id || ""); // ✅ Fixed here
-    setEditIndex(index);
+  const handleSearch = () => {
+    const allPatients = JSON.parse(localStorage.getItem("registeredPatients")) || [];
+    const match = allPatients.find((p) => p.phone_no === searchPhone.trim());
+    setFoundPatient(match);
+    setShowModal(!!match);
   };
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    const storedPatients =
-      JSON.parse(localStorage.getItem("registeredPatients")) || [];
-    const foundPatient = storedPatients.find(
-      (p) => p.phone_no === e.target.value
-    );
-    setSelectedPatient(foundPatient || null);
-  };
-
-  const handleEditFromSearch = () => {
-    if (!selectedPatient) return;
-    setFormData({ ...selectedPatient });
-    setSelectedDoctorId(selectedPatient.doctor_id || ""); // ✅ Fixed here
-    const storedPatients =
-      JSON.parse(localStorage.getItem("registeredPatients")) || [];
-    const index = storedPatients.findIndex(
-      (p) => p.phone_no === selectedPatient.phone_no
-    );
-    if (index !== -1) {
-      setEditIndex(index);
-    }
+  const closeModal = () => {
+    setShowModal(false);
+    setSearchPhone("");
+    setFoundPatient(null);
   };
 
   return (
@@ -238,28 +195,10 @@ const Patientdash = () => {
       {errorMessage && <p className="error">{errorMessage}</p>}
       {successMessage && <p className="success">{successMessage}</p>}
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="fullName"
-          placeholder="Full Name"
-          value={formData.fullName}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="healthinfo"
-          placeholder="Health Information"
-          value={formData.healthinfo}
-          onChange={handleChange}
-          required
-        />
+        <input type="text" name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleChange} required />
+        <input type="text" name="healthinfo" placeholder="Health Information" value={formData.healthinfo} onChange={handleChange} required />
         <div>
-          <select
-            value={selectedDoctorId}
-            onChange={(e) => setSelectedDoctorId(e.target.value)}
-            disabled={isSubmitting}
-          >
+          <select value={selectedDoctorId} onChange={(e) => setSelectedDoctorId(e.target.value)} disabled={isSubmitting}>
             <option value="">-- Select a Doctor --</option>
             {doctors.map((doctor) => (
               <option key={doctor.user_id} value={doctor.user_id}>
@@ -274,75 +213,39 @@ const Patientdash = () => {
           <option value="Female">Female</option>
           <option value="Other">Other</option>
         </select>
-        <input
-          type="date"
-          name="dob"
-          value={formData.dob}
-          onChange={handleChange}
-          required
-        />
+        <input type="date" name="dob" value={formData.dob} onChange={handleChange} required />
         <p>Age: {formData.age}</p>
-        <input
-          type="text"
-          name="address"
-          placeholder="Address"
-          value={formData.address}
-          onChange={handleChange}
-        />
-        <input
-          type="tel"
-          name="phone_no"
-          placeholder="Phone"
-          value={formData.phone_no}
-          onChange={handleChange}
-          pattern="[0-9]{10}"
-          maxLength="10"
-          required
-        />
-        <button type="submit" disabled={isSubmitting}>
-          {editIndex !== null ? "Update Patient" : "Add Patient"}
-        </button>
+        <input type="text" name="address" placeholder="Address" value={formData.address} onChange={handleChange} />
+        <input type="tel" name="phone_no" placeholder="Phone" value={formData.phone_no} onChange={handleChange} pattern="[0-9]{10}" maxLength="10" required />
+        <button type="submit" disabled={isSubmitting}>Add Patient</button>
       </form>
-      <br />
-      <div className="search-container">
-        <input
-          className="search-bar"
-          type="tel"
-          placeholder="Search by Phone Number"
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-      </div>
+
       <br />
       <div className="registered-patients">
-        <center>
-          <h2>Registered Patients</h2>
-        </center>
+        <center><h2>Registered Patients</h2></center>
+        <div className="search-container">
+        <input
+          type="text"
+          pattern="[0-9]{10}" 
+          maxLength="10"
+          value={searchPhone}
+
+          onChange={(e) => setSearchPhone(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
+        </div>
+
+
         {patients.length > 0 ? (
           <ul>
             {patients.map((patient, index) => (
               <li key={index}>
-                <p>
-                  <strong>Name:</strong> {patient.fullName}
-                </p>
-                <p>
-                  <strong>Contact Number:</strong> {patient.phone_no}
-                </p>
-                <p>
-                  <strong>Sex:</strong> {patient.sex}
-                </p>
-                <p>
-                  <strong>DOB:</strong> {patient.dob}
-                </p>
-                <p>
-                  <strong>Age:</strong> {patient.age}
-                </p>
-                <button onClick={() => handleEdit(index)}>Edit</button>
-                &nbsp;&nbsp;&nbsp;
-                <button
-                  type="button"
-                  onClick={() => handleFetchDoctorsAndNavigate(patient)}
-                >
+                <p><strong>Name:</strong> {patient.fullName}</p>
+                <p><strong>Contact Number:</strong> {patient.phone_no}</p>
+                <p><strong>Sex:</strong> {patient.sex}</p>
+                <p><strong>DOB:</strong> {patient.dob}</p>
+                <p><strong>Age:</strong> {patient.age}</p>
+                <button type="button" onClick={() => handleBookAppointment(patient)}>
                   Book Appointment
                 </button>
               </li>
@@ -352,6 +255,21 @@ const Patientdash = () => {
           <p>No registered patients found.</p>
         )}
       </div>
+
+      {showModal && foundPatient && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Patient Details</h3>
+            <p><strong>Name:</strong> {foundPatient.fullName}</p>
+            <p><strong>Phone:</strong> {foundPatient.phone_no}</p>
+            <p><strong>Age:</strong> {foundPatient.age}</p>
+            <p><strong>Sex:</strong> {foundPatient.sex}</p>
+            <p><strong>Address:</strong> {foundPatient.address}</p>
+            <p><strong>Health Info:</strong> {foundPatient.healthinfo}</p>
+            <button onClick={closeModal}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
