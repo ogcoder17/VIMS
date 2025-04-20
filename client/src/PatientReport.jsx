@@ -152,7 +152,7 @@ const PatientReport = () => {
           </table>
         </div>
       ) : (
-        <div className="no-data-message">Select a {reportType} to view report.</div>
+        <div className="no-data-message"> SELECT DAILY, MONTHY AND YEARLY TO VIEW REPORTS.</div>
       )}
     </div>
   );
