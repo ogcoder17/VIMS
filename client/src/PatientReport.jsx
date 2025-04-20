@@ -6,12 +6,21 @@ import "./css/Patientreport.css";
 const PatientReport = () => {
   const [reportData, setReportData] = useState([]);
   const [reportType, setReportType] = useState("daily");
+  const [selectedDate, setSelectedDate] = useState(""); // YYYY-MM-DD
+  const [selectedMonth, setSelectedMonth] = useState(""); // YYYY-MM
+  const [selectedYear, setSelectedYear] = useState(""); // YYYY
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchReport();
-  }, [reportType]);
+    if (
+      (reportType === "daily" && selectedDate) ||
+      (reportType === "monthly" && selectedMonth) ||
+      (reportType === "yearly" && selectedYear)
+    ) {
+      fetchReport();
+    }
+  }, [reportType, selectedDate, selectedMonth, selectedYear]);
 
   const fetchReport = async () => {
     try {
@@ -20,18 +29,27 @@ const PatientReport = () => {
       const accessToken = localStorage.getItem("accessToken");
 
       if (!userId || !refreshToken || !accessToken) {
-        console.error("Missing Local Storage:", {
-          userId,
-          refreshToken,
-          accessToken,
-        });
         setErrorMessage("Authentication error. Please log in again.");
         return;
       }
 
+      const payload = {};
+      if (reportType === "daily" && selectedDate) {
+        const dateObj = new Date(selectedDate)
+        payload.date = dateObj.getDate();
+        payload.month = dateObj.getMonth() + 1;
+        payload.year = dateObj.getFullYear();
+      } else if (reportType === "monthly" && selectedMonth) {
+        const [year, month] = selectedMonth.split("-");
+        payload.month = parseInt(month, 10);
+        payload.year = parseInt(year, 10);
+      } else if (reportType === "yearly" && selectedYear) {
+        payload.year = parseInt(selectedYear, 10);
+      }
+
       const requestBody = {
         auth_params: { user_id: userId, refresh_token: refreshToken },
-        payload: {},
+        payload,
       };
 
       const response = await axios.post(
@@ -46,13 +64,11 @@ const PatientReport = () => {
       );
 
       if (response.status === 200 && response.data) {
-        const data = response.data;
-        const formattedReport = Object.entries(data).map(([department, counts]) => ({
+        const formatted = Object.entries(response.data).map(([department, count]) => ({
           department,
-          count: counts[reportType] || 0,
+          count,
         }));
-
-        setReportData(formattedReport);
+        setReportData(formatted);
         setErrorMessage("");
       } else {
         setErrorMessage("Failed to fetch patient report.");
@@ -63,15 +79,52 @@ const PatientReport = () => {
     }
   };
 
+  const handleReportTypeChange = (e) => {
+    const type = e.target.value;
+    setReportType(type);
+    setReportData([]);
+    setSelectedDate("");
+    setSelectedMonth("");
+    setSelectedYear("");
+  };
+
   return (
     <div className="patient-report-container">
       <div className="header">
         <h2>Patient Report</h2>
-        <select onChange={(e) => setReportType(e.target.value)} value={reportType}>
+        <select onChange={handleReportTypeChange} value={reportType}>
           <option value="daily">Daily Report</option>
           <option value="monthly">Monthly Report</option>
           <option value="yearly">Yearly Report</option>
         </select>
+
+        {reportType === "daily" && (
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+        )}
+
+        {reportType === "monthly" && (
+          <input
+            type="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+          />
+        )}
+
+        {reportType === "yearly" && (
+          <input
+            type="number"
+            placeholder="Enter Year (e.g. 2024)"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+            min="2000"
+            max="2100"
+          />
+        )}
+
         <button className="btn back-btn" onClick={() => navigate("/Staffdash")}>
           Back to Staff Dashboard
         </button>
@@ -99,7 +152,7 @@ const PatientReport = () => {
           </table>
         </div>
       ) : (
-        <div className="no-data-message">No report data available.</div>
+        <div className="no-data-message">Select a {reportType} to view report.</div>
       )}
     </div>
   );
